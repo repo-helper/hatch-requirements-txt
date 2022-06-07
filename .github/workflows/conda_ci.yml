@@ -1,0 +1,65 @@
+# This file is managed by 'repo_helper'. Don't edit it directly.
+---
+name: Conda Tests
+
+on:
+  push:
+    branches: ["master"]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: "Conda"
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout 🛎️
+        uses: "actions/checkout@v2"
+
+      - name: Setup Python 🐍
+        uses: "actions/setup-python@v2"
+        with:
+          python-version: "3.8"
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: env
+          conda-build-version: 3.21.0
+
+      - name: Install dependencies 🔧
+        run: |
+          python -VV
+          python -m site
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade "whey-conda" "hatchling"
+          # $CONDA is an environment variable pointing to the root of the miniconda directory
+          $CONDA/bin/conda update -n base conda
+          $CONDA/bin/conda config --add channels conda-forge
+          $CONDA/bin/conda config --add channels domdfcoding
+
+      - name: "Build and index channel"
+        run: |
+          python -m whey --builder whey_conda --out-dir conda-bld/noarch
+          $CONDA/bin/conda index ./conda-bld || exit 1
+
+      - name: "Search for package"
+        run: |
+          $CONDA/bin/conda search -c file://$(pwd)/conda-bld hatch-requirements-txt
+          $CONDA/bin/conda search -c file://$(pwd)/conda-bld --override-channels hatch-requirements-txt
+
+      - name: "Install package"
+        run: |
+          $CONDA/bin/conda install -c file://$(pwd)/conda-bld hatch-requirements-txt=0.0.0=py_1 -y || exit 1
+
+      - name: "Run Tests"
+        run: |
+          rm -rf hatch_requirements_txt
+          $CONDA/bin/conda install pytest coincidence || exit 1
+          pip install -r tests/requirements.txt
+          pytest tests/

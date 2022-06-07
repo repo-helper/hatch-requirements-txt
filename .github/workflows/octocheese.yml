@@ -1,0 +1,18 @@
+# This file is managed by 'repo_helper'. Don't edit it directly.
+---
+
+name: "GitHub Releases"
+on:
+  schedule:
+    - cron: 0 12 * * *
+
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: domdfcoding/octocheese@master
+        with:
+          pypi_name: "hatch-requirements-txt"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        if: startsWith(github.ref, 'refs/tags/') != true

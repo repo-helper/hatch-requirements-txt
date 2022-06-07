@@ -1,0 +1,9 @@
+# This file is managed by 'repo_helper'. Don't edit it directly.
+---
+addReviewers: true
+addAssignees: true
+reviewers:
+- domdfcoding
+numberOfReviewers: 0
+
+# more settings at https://github.com/marketplace/actions/auto-assign-action

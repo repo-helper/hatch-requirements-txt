@@ -1,0 +1,48 @@
+# Configuration for 'repo_helper' (https://github.com/domdfcoding/repo_helper)
+---
+modname: 'hatch-requirements-txt'
+copyright_years: '2022'
+author: 'Dominic Davis-Foster'
+email: 'dominic@davis-foster.co.uk'
+username: 'repo-helper'
+assignee: 'domdfcoding'
+primary_conda_channel: "domdfcoding"
+version: '0.0.0'
+license: 'MIT'
+short_desc: "Hatchling plugin to read project dependencies from requirements.txt"
+
+python_deploy_version: 3.7
+enable_docs: false
+min_coverage: 97.5
+use_hatch: true
+
+conda_channels:
+ - conda-forge
+
+# Versions to run tests for
+python_versions:
+ - '3.6'
+ - '3.7'
+ - '3.8'
+ - '3.9'
+ - "3.10"
+ - 3.11-dev
+ - pypy36
+ - pypy37
+ - pypy38
+
+classifiers:
+ - 'Development Status :: 4 - Beta'
+ - 'Intended Audience :: Developers'
+ - 'Topic :: Software Development :: Libraries :: Python Modules'
+ - "Topic :: System :: Archiving :: Packaging"
+ - "Framework :: Hatch"
+
+keywords:
+ - hatch
+ - requirements
+ - dependencies
+
+entry_points:
+ hatch:
+  - requirements_txt = hatch_requirements_txt
