@@ -1,2 +1,2 @@
-hatchling>=0.24.0
+hatchling>=0.21.0
 packaging>=21.3

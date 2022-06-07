@@ -27,7 +27,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Archiving :: Packaging",
 ]
-dependencies = [ "hatchling>=0.24.0", "packaging>=21.3",]
+dependencies = [ "hatchling>=0.21.0", "packaging>=21.3",]
 dynamic = []
 
 [[project.authors]]
