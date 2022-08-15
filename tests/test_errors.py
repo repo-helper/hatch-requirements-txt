@@ -4,7 +4,7 @@ from typing import Callable
 # 3rd party
 import pytest
 from domdf_python_tools.paths import PathPlus, in_directory
-from hatchling.build import build_sdist, build_wheel  # type: ignore[import]
+from hatchling.build import build_sdist, build_wheel
 from packaging.requirements import InvalidRequirement
 
 pyproject_toml = """

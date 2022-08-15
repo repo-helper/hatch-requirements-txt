@@ -3,7 +3,7 @@ import handy_archives
 from dist_meta.distributions import WheelDistribution
 from dist_meta.metadata import loads
 from domdf_python_tools.paths import PathPlus, in_directory
-from hatchling.build import build_sdist, build_wheel  # type: ignore[import]
+from hatchling.build import build_sdist, build_wheel
 
 pyproject_toml = """
 [project]

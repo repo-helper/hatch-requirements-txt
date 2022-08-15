@@ -31,8 +31,8 @@ import os
 from typing import Iterable, List, Tuple, Type
 
 # 3rd party
-from hatchling.metadata.plugin.interface import MetadataHookInterface  # type: ignore[import]
-from hatchling.plugin import hookimpl  # type: ignore[import]
+from hatchling.metadata.plugin.interface import MetadataHookInterface
+from hatchling.plugin import hookimpl
 from packaging.requirements import Requirement
 from packaging.utils import canonicalize_name
 
