@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hatch-requirements-txt"
-version = "0.1.0"
+version = "0.1.1"
 description = "Hatchling plugin to read project dependencies from requirements.txt"
 readme = "README.rst"
 requires-python = ">=3.6.1"
