@@ -45,7 +45,7 @@ __version__: str = "0.1.0"
 __email__: str = "dominic@davis-foster.co.uk"
 
 
-def parse_requirements(requirements: Iterable[str], ) -> Tuple[List[Requirement], List[str]]:
+def parse_requirements(requirements: Iterable[str]) -> Tuple[List[Requirement], List[str]]:
 	"""
 	Parse the given strings as :pep:`508` requirements.
 
@@ -58,7 +58,7 @@ def parse_requirements(requirements: Iterable[str], ) -> Tuple[List[Requirement]
 	parsed_requirements: List[Requirement] = []
 
 	for line in requirements:
-		if line.startswith('#'):
+		if line.lstrip().startswith('#'):
 			comments.append(line)
 		elif line:
 			req = Requirement(line)
