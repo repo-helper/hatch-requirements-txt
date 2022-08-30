@@ -48,8 +48,8 @@ hatch-requirements-txt
 	:target: https://github.com/repo-helper/hatch-requirements-txt/actions?query=workflow%3A%22mypy%22
 	:alt: mypy status
 
-.. |requires| image:: https://dependency-dash.herokuapp.com/github/repo-helper/hatch-requirements-txt/badge.svg
-	:target: https://dependency-dash.herokuapp.com/github/repo-helper/hatch-requirements-txt/
+.. |requires| image:: https://dependency-dash.repo-helper.uk/github/repo-helper/hatch-requirements-txt/badge.svg
+	:target: https://dependency-dash.repo-helper.uk/github/repo-helper/hatch-requirements-txt/
 	:alt: Requirements Status
 
 .. |coveralls| image:: https://img.shields.io/coveralls/github/repo-helper/hatch-requirements-txt/master?logo=coveralls
