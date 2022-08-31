@@ -9,7 +9,6 @@ hatch-requirements-txt
 .. end short_desc
 
 
-.. start shields
 
 .. list-table::
 	:stub-columns: 1
@@ -110,7 +109,7 @@ hatch-requirements-txt
 	:target: https://pypi.org/project/hatch-requirements-txt/
 	:alt: PyPI - Downloads
 
-.. end shields
+
 
 Installation
 --------------
