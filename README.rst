@@ -9,7 +9,6 @@ hatch-requirements-txt
 .. end short_desc
 
 
-.. start shields
 
 .. list-table::
 	:stub-columns: 1
@@ -26,7 +25,7 @@ hatch-requirements-txt
 	* - QA
 	  - |codefactor| |actions_flake8| |actions_mypy|
 	* - Other
-	  - |license| |language| |requires|
+	  - |hatch| |license| |language| |requires|
 
 .. |actions_linux| image:: https://github.com/repo-helper/hatch-requirements-txt/workflows/Linux/badge.svg
 	:target: https://github.com/repo-helper/hatch-requirements-txt/actions?query=workflow%3A%22Linux%22
@@ -84,6 +83,10 @@ hatch-requirements-txt
 	:target: https://anaconda.org/domdfcoding/hatch-requirements-txt
 	:alt: Conda - Platform
 
+.. |hatch| image:: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
+	:target: https://github.com/pypa/hatch
+	:alt: Hatch project
+
 .. |license| image:: https://img.shields.io/github/license/repo-helper/hatch-requirements-txt
 	:target: https://github.com/repo-helper/hatch-requirements-txt/blob/master/LICENSE
 	:alt: License
@@ -106,7 +109,7 @@ hatch-requirements-txt
 	:target: https://pypi.org/project/hatch-requirements-txt/
 	:alt: PyPI - Downloads
 
-.. end shields
+
 
 Installation
 --------------
