@@ -100,3 +100,23 @@ def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 
 	with in_directory(tmp_pathplus), pytest.raises(ValueError, match="^'dependencies' is already listed in the 'project' table.$"):
 		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_filename_and_files(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml + 'files = ["requirements.txt"]\n')
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+		"^Cannot specify both 'filename' and 'files' in "
+		"\\[tool.hatch.metadata.hooks.requirements_txt\\].$"
+	)):
+		wheel_file = build_func(dist_dir)

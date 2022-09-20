@@ -154,4 +154,4 @@ In your ``pyproject.toml`` make the following changes:
 .. code-block:: toml
 
 	[tool.hatch.metadata.hooks.requirements_txt]
-	filename = "requirements.txt"
+	files = ["requirements.txt"]

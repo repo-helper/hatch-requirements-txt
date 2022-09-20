@@ -1,19 +1,17 @@
 # stdlib
-from typing import List
+from typing import Callable, List, Union
 
 # 3rd party
-import handy_archives
+import pkginfo
 import pytest
 from coincidence.regressions import AdvancedDataRegressionFixture
-from dist_meta.distributions import WheelDistribution
-from dist_meta.metadata import loads
 from domdf_python_tools.paths import PathPlus, in_directory
 from hatchling.build import build_sdist, build_wheel
 
 # this package
 from hatch_requirements_txt import parse_requirements
 
-pyproject_toml = """
+pyproject_toml_header = """
 [project]
 name = "demo"
 version = "0.0.1"
@@ -33,51 +31,56 @@ dynamic = ["dependencies"]
 [project.urls]
 Homepage = "https://github.com/pypa/sampleproject"
 "Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
-
-[tool.hatch.metadata.hooks.requirements_txt]
-filename = "requirements.txt"
 """
 
 
-def test_wheel(tmp_pathplus: PathPlus):
+def get_pkginfo(tmp_pathplus: PathPlus, build_func: Callable,
+				pyproject_toml: str) -> Union[pkginfo.SDist, pkginfo.Wheel]:
 
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
 	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml)
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus):
+		dist_filename = build_func(dist_dir)
+		dist_file = dist_dir / dist_filename
+		if dist_filename.endswith(".whl"):
+			info = pkginfo.Wheel(dist_file)
+		elif dist_filename.endswith(".tar.gz"):
+			info = pkginfo.SDist(dist_file)
+		else:
+			raise ValueError(f"Dist file {dist_filename} is neither a wheel nor an sdist.")
+		return info
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_build_with_filename(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header + """
+[tool.hatch.metadata.hooks.requirements_txt]
+filename = "requirements.txt"
+"""
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
-	(tmp_pathplus / "README.md").touch()
-	(tmp_pathplus / "LICENSE").touch()
-	(tmp_pathplus / "demo").maybe_make()
-	(tmp_pathplus / "demo" / "__init__.py").touch()
-
-	with in_directory(tmp_pathplus):
-		wheel_file = build_wheel(dist_dir)
-
-	with WheelDistribution.from_path(dist_dir / wheel_file) as wd:
-		metadata = wd.get_metadata()
-		assert metadata is not None
-		assert metadata.get_all("Requires-Dist") == ["bar", "baz>1", "foo"]
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "baz>1", "foo"]
 
 
-def test_sdist(tmp_pathplus: PathPlus):
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_build_with_files(tmp_pathplus: PathPlus, build_func: Callable):
 
-	dist_dir = tmp_pathplus / "dist"
-	dist_dir.maybe_make()
-
-	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml)
-	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1", "  #buzz"])
-	(tmp_pathplus / "README.md").touch()
-	(tmp_pathplus / "LICENSE").touch()
-	(tmp_pathplus / "demo").maybe_make()
-	(tmp_pathplus / "demo" / "__init__.py").touch()
-
-	with in_directory(tmp_pathplus):
-		wheel_file = build_sdist(dist_dir)
-
-	with handy_archives.TarFile.open(dist_dir / wheel_file) as sdist:
-		metadata = loads(sdist.read_text("demo-0.0.1/PKG-INFO"))
-		assert metadata.get_all("Requires-Dist") == ["bar", "baz>1", "foo"]
+	pyproject_toml = pyproject_toml_header + """
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements1.txt", "requirements2.txt"]
+"""
+	(tmp_pathplus / "requirements1.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
+	(tmp_pathplus / "requirements2.txt").write_lines(["beep", "bop", "boop"])
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "baz>1", "beep", "boop", "bop", "foo"]
 
 
 requirements_a = [

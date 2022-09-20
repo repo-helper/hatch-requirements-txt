@@ -28,7 +28,7 @@ Hatchling plugin to read project dependencies from ``requirements.txt``.
 
 # stdlib
 import os
-from typing import Iterable, List, Tuple, Type
+from typing import Iterable, List, Optional, Tuple, Type
 
 # 3rd party
 from hatchling.metadata.plugin.interface import MetadataHookInterface
@@ -80,12 +80,28 @@ class RequirementsMetadataHook(MetadataHookInterface):
 		Update the project table's metadata.
 		"""
 
-		filename = self.config.get("filename", "requirements.txt")
-		if not os.path.isfile(filename):
-			raise FileNotFoundError(filename)
+		filename: Optional[str] = self.config.get("filename", None)
+		files: Optional[List[str]] = self.config.get("files", None)
+		if filename is not None:
+			if files is not None:
+				raise ValueError(
+						"Cannot specify both 'filename' and 'files' in "
+						"[tool.hatch.metadata.hooks.requirements_txt]."
+						)
+			files = [filename]
+		else:
+			if files is None:
+				files = ["requirements.txt"]
+		assert isinstance(files, List)
 
-		with open(filename, encoding="UTF-8") as fp:
-			requirements, _ = parse_requirements(fp.read().splitlines())
+		requirements = []
+		for filename in files:
+			if not os.path.isfile(filename):
+				raise FileNotFoundError(filename)
+
+			with open(filename, encoding="UTF-8") as fp:
+				incoming_requirements, _ = parse_requirements(fp.read().splitlines())
+				requirements.extend(incoming_requirements)
 
 		if "dependencies" in metadata:
 			raise ValueError("'dependencies' is already listed in the 'project' table.")
