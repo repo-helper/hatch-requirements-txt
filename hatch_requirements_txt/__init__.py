@@ -28,7 +28,7 @@ Hatchling plugin to read project dependencies from ``requirements.txt``.
 
 # stdlib
 import os
-from typing import Iterable, List, Optional, Tuple, Type
+from typing import Dict, Iterable, List, Optional, Tuple, Type
 
 # 3rd party
 from hatchling.metadata.plugin.interface import MetadataHookInterface
@@ -129,6 +129,19 @@ class RequirementsMetadataHook(MetadataHookInterface):
 			raise ValueError("'dependencies' is not listed in 'project.dynamic'.")
 		else:
 			metadata["dependencies"] = [str(r) for r in requirements]
+
+		# Also handle optional-dependencies if present
+		optional_dependency_files: Optional[Dict[str, List[str]]] = self.config.get("optional-dependencies", None)
+		if optional_dependency_files is not None:
+			if "optional-dependencies" in metadata:
+				raise ValueError("'optional-dependencies' is already listed in the 'project' table.")
+			elif "optional-dependencies" not in metadata.get("dynamic", []):
+				raise ValueError("'optional-dependencies' is not listed in 'project.dynamic'.")
+			else:
+				metadata["optional-dependencies"] = {}
+				for feature_name, files in optional_dependency_files.items():
+					requirements, _ = load_requirements_files(files)
+					metadata["optional-dependencies"][feature_name] = [str(r) for r in requirements]
 
 
 @hookimpl
