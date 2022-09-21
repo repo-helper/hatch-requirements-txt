@@ -157,7 +157,7 @@ In your ``pyproject.toml`` make the following changes:
 	files = ["requirements.txt"]
 
 Optionally, you can also define groups of `optional dependencies <https://hatch.pypa.io/latest/config/dependency/#features>`_
-by appending ``optional-dependencies`` to ``project.dynamic`` and adding a table like:
+(also known as "features") by appending ``optional-dependencies`` to ``project.dynamic`` and adding a table like:
 
 .. code-block:: toml
 
