@@ -68,6 +68,33 @@ def parse_requirements(requirements: Iterable[str]) -> Tuple[List[Requirement], 
 	return parsed_requirements, comments
 
 
+def load_requirements_files(files: List[str]) -> Tuple[List[Requirement], List[str]]:
+	"""
+	Load the given requirements files.
+
+	:param files:
+
+	:return: The requirements, and a list of commented lines.
+	"""
+
+	all_parsed_requirements: List[Requirement] = []
+	all_comments = []
+
+	if not isinstance(files, List):
+		raise ValueError(f"Requirements files must be a list, but got {type(files)}: {files}.")
+
+	for filename in files:
+		if not isinstance(filename, str):
+			raise ValueError(f"Requirements file {filename} must be a string, but got {type(filename)}.")
+		if not os.path.isfile(filename):
+			raise FileNotFoundError(filename)
+		with open(filename, encoding="UTF-8") as fp:
+			parsed_requirements, comments = parse_requirements(fp.read().splitlines())
+		all_parsed_requirements.extend(parsed_requirements)
+		all_comments.extend(comments)
+	return all_parsed_requirements, all_comments
+
+
 class RequirementsMetadataHook(MetadataHookInterface):
 	"""
 	Hatch metadata hook to populate 'project.depencencies' from a ``requirements.txt`` file.
@@ -80,28 +107,21 @@ class RequirementsMetadataHook(MetadataHookInterface):
 		Update the project table's metadata.
 		"""
 
+		# 'filename' is the old way to specify a single requirements file. 'files' is preferred.
 		filename: Optional[str] = self.config.get("filename", None)
 		files: Optional[List[str]] = self.config.get("files", None)
-		if filename is not None:
+		if filename is None:
+			if files is None:
+				files = ["requirements.txt"]
+		else:
 			if files is not None:
 				raise ValueError(
 						"Cannot specify both 'filename' and 'files' in "
 						"[tool.hatch.metadata.hooks.requirements_txt]."
 						)
 			files = [filename]
-		else:
-			if files is None:
-				files = ["requirements.txt"]
-		assert isinstance(files, List)
 
-		requirements = []
-		for filename in files:
-			if not os.path.isfile(filename):
-				raise FileNotFoundError(filename)
-
-			with open(filename, encoding="UTF-8") as fp:
-				incoming_requirements, _ = parse_requirements(fp.read().splitlines())
-				requirements.extend(incoming_requirements)
+		requirements, _ = load_requirements_files(files)
 
 		if "dependencies" in metadata:
 			raise ValueError("'dependencies' is already listed in the 'project' table.")
