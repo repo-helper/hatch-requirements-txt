@@ -83,6 +83,41 @@ files = ["requirements1.txt", "requirements2.txt"]
 	assert info.requires_dist == ["bar", "baz>1", "beep", "boop", "bop", "foo"]
 
 
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_optional_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header + """
+[tool.hatch.metadata.hooks.requirements_txt]
+filename = "requirements.txt"
+
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+crypto = ["requirements-crypto.txt"]
+fastjson = ["requirements-fastjson.txt"]
+cli = ["requirements-cli.txt"]
+"""
+	pyproject_toml = pyproject_toml.replace(
+			'dynamic = ["dependencies"]', 'dynamic = ["dependencies", "optional-dependencies"]'
+			)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
+	(tmp_pathplus / "requirements-crypto.txt").write_lines(["PyJWT", "cryptography"])
+	(tmp_pathplus / "requirements-fastjson.txt").write_lines(["orjson"])
+	(tmp_pathplus / "requirements-cli.txt").write_lines([
+			"prompt-toolkit", "colorama; platform_system == 'Windows'"
+			])
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.provides_extras == ["cli", "crypto", "fastjson"]
+	assert info.requires_dist == [
+			"bar",
+			"baz>1",
+			"foo",
+			"colorama; platform_system == 'Windows' and extra == 'cli'",
+			"prompt-toolkit; extra == 'cli'",
+			"cryptography; extra == 'crypto'",
+			"pyjwt; extra == 'crypto'",
+			"orjson; extra == 'fastjson'"
+			]
+
+
 requirements_a = [
 		"autodocsumm>=0.2.0",
 		"default-values>=0.2.0",

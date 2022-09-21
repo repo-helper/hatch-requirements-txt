@@ -84,6 +84,27 @@ def test_not_dynamic(tmp_pathplus: PathPlus, build_func: Callable):
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_optional_not_dynamic(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	optional_dependencies_section = """
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev = ["requirements-dev.txt"]
+	"""
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml + optional_dependencies_section)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match="^'optional-dependencies' is not listed in 'project.dynamic'.$"):
+		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 
 	dist_dir = tmp_pathplus / "dist"
@@ -99,6 +120,35 @@ def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
 	with in_directory(tmp_pathplus), pytest.raises(ValueError, match="^'dependencies' is already listed in the 'project' table.$"):
+		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_optional_already_given(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	optional_dependencies_sections = """
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev = ["requirements-dev.txt"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+	"""
+	(tmp_pathplus / "pyproject.toml").write_clean(
+			pyproject_toml.
+			replace('dynamic = ["dependencies"]', 'dynamic = ["dependencies", "optional-dependencies"]')
+			+ optional_dependencies_sections
+			)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
+	(tmp_pathplus / "requirements-dev.txt").write_lines(["pre-commit"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match="^'optional-dependencies' is already listed in the 'project' table.$"):
 		wheel_file = build_func(dist_dir)
 
 
