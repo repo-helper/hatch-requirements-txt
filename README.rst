@@ -126,17 +126,9 @@ To install with ``pip``:
 
 To install with ``conda``:
 
-	* First add the required channels
+.. code-block:: bash
 
-	.. code-block:: bash
-
-		$ conda config --add channels https://conda.anaconda.org/conda-forge
-
-	* Then install
-
-	.. code-block:: bash
-
-		$ conda install hatch-requirements-txt
+	$ conda install -c conda-forge hatch-requirements-txt
 
 .. end installation
 
