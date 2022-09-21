@@ -81,11 +81,11 @@ def load_requirements_files(files: List[str]) -> Tuple[List[Requirement], List[s
 	all_comments = []
 
 	if not isinstance(files, List):
-		raise ValueError(f"Requirements files must be a list, but got {type(files)}: {files}.")
+		raise TypeError(f"Requirements files must be a list, but got {type(files)}: {files}.")
 
 	for filename in files:
 		if not isinstance(filename, str):
-			raise ValueError(f"Requirements file {filename} must be a string, but got {type(filename)}.")
+			raise TypeError(f"Requirements file {filename} must be a string, but got {type(filename)}.")
 		if not os.path.isfile(filename):
 			raise FileNotFoundError(filename)
 		with open(filename, encoding="UTF-8") as fp:
