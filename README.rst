@@ -75,12 +75,12 @@ hatch-requirements-txt
 	:target: https://pypi.org/project/hatch-requirements-txt/
 	:alt: PyPI - Wheel
 
-.. |conda-version| image:: https://img.shields.io/conda/v/domdfcoding/hatch-requirements-txt?logo=anaconda
-	:target: https://anaconda.org/domdfcoding/hatch-requirements-txt
+.. |conda-version| image:: https://img.shields.io/conda/v/conda-forge/hatch-requirements-txt?logo=anaconda
+	:target: https://anaconda.org/conda-forge/hatch-requirements-txt
 	:alt: Conda - Package Version
 
-.. |conda-platform| image:: https://img.shields.io/conda/pn/domdfcoding/hatch-requirements-txt?label=conda%7Cplatform
-	:target: https://anaconda.org/domdfcoding/hatch-requirements-txt
+.. |conda-platform| image:: https://img.shields.io/conda/pn/conda-forge/hatch-requirements-txt?label=conda%7Cplatform
+	:target: https://anaconda.org/conda-forge/hatch-requirements-txt
 	:alt: Conda - Platform
 
 .. |hatch| image:: https://img.shields.io/badge/%F0%9F%A5%9A-Hatch-4051b5.svg
@@ -131,7 +131,6 @@ To install with ``conda``:
 	.. code-block:: bash
 
 		$ conda config --add channels https://conda.anaconda.org/conda-forge
-		$ conda config --add channels https://conda.anaconda.org/domdfcoding
 
 	* Then install
 
