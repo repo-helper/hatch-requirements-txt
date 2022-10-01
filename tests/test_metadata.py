@@ -2,7 +2,7 @@
 from typing import Callable, List, Union
 
 # 3rd party
-import pkginfo
+import pkginfo  # type: ignore
 import pytest
 from coincidence.regressions import AdvancedDataRegressionFixture
 from domdf_python_tools.paths import PathPlus, in_directory
