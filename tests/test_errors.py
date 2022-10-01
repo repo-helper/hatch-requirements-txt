@@ -170,3 +170,45 @@ def test_filename_and_files(tmp_pathplus: PathPlus, build_func: Callable):
 		"\\[tool.hatch.metadata.hooks.requirements_txt\\].$"
 	)):
 		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_filename_parameter_not_str(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(
+			pyproject_toml.replace('filename = "requirements.txt"', 'filename = ["requirements.txt"]')
+			)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(TypeError, match=(
+		r"^Requirements file \['requirements.txt'\] must be a string, but got <class 'list'>.$"
+	)):
+		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_files_parameter_not_list(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(
+			pyproject_toml.replace('filename = "requirements.txt"', 'files = "requirements.txt"')
+			)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(TypeError, match=(
+		"^Requirements files must be a list, but got <class 'str'>: requirements.txt.$"
+	)):
+		wheel_file = build_func(dist_dir)

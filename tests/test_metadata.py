@@ -71,6 +71,18 @@ filename = "requirements.txt"
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_build_unspecified(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header + """
+[tool.hatch.metadata.hooks.requirements_txt]
+# filename = "requirements.txt"
+"""
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "baz>1", "foo"]
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_build_with_files(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
