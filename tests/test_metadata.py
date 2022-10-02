@@ -34,8 +34,11 @@ Homepage = "https://github.com/pypa/sampleproject"
 """
 
 
-def get_pkginfo(tmp_pathplus: PathPlus, build_func: Callable,
-				pyproject_toml: str) -> Union[pkginfo.SDist, pkginfo.Wheel]:
+def get_pkginfo(
+		tmp_pathplus: PathPlus,
+		build_func: Callable,
+		pyproject_toml: str,
+		) -> Union[pkginfo.SDist, pkginfo.Wheel]:
 
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
