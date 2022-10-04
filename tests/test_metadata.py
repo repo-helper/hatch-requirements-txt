@@ -99,6 +99,22 @@ files = ["requirements1.txt", "requirements2.txt"]
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_build_files_in_subdirectory(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header + """
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements/dev.txt", "requirements/docs.txt", "requirements/tests.txt"]
+"""
+	reqs_subdir = tmp_pathplus / "requirements"
+	reqs_subdir.maybe_make()
+	(reqs_subdir / "dev.txt").write_lines(["pre-commit"])
+	(reqs_subdir / "docs.txt").write_lines(["mkdocs"])
+	(reqs_subdir / "tests.txt").write_lines(["pytest"])
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["mkdocs", "pre-commit", "pytest"]
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_optional_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
