@@ -153,4 +153,14 @@ In your ``pyproject.toml`` make the following changes:
 .. code-block:: toml
 
 	[tool.hatch.metadata.hooks.requirements_txt]
-	filename = "requirements.txt"
+	files = ["requirements.txt"]
+
+Optionally, you can also define groups of `optional dependencies <https://hatch.pypa.io/latest/config/dependency/#features>`_
+(also known as "features") by appending ``optional-dependencies`` to ``project.dynamic`` and adding a table like:
+
+.. code-block:: toml
+
+	[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+	crypto = ["requirements-crypto.txt"]
+	fastjson = ["requirements-fastjson.txt"]
+	cli = ["requirements-cli.txt"]

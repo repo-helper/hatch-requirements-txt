@@ -28,7 +28,7 @@ Hatchling plugin to read project dependencies from ``requirements.txt``.
 
 # stdlib
 import os
-from typing import Iterable, List, Tuple, Type
+from typing import Dict, Iterable, List, Optional, Tuple, Type
 
 # 3rd party
 from hatchling.metadata.plugin.interface import MetadataHookInterface
@@ -68,6 +68,33 @@ def parse_requirements(requirements: Iterable[str]) -> Tuple[List[Requirement], 
 	return parsed_requirements, comments
 
 
+def load_requirements_files(files: List[str]) -> Tuple[List[Requirement], List[str]]:
+	"""
+	Load the given requirements files.
+
+	:param files:
+
+	:return: The requirements, and a list of commented lines.
+	"""
+
+	all_parsed_requirements: List[Requirement] = []
+	all_comments = []
+
+	if not isinstance(files, List):
+		raise TypeError(f"Requirements files must be a list, but got {type(files)}: {files}.")
+
+	for filename in files:
+		if not isinstance(filename, str):
+			raise TypeError(f"Requirements file {filename} must be a string, but got {type(filename)}.")
+		if not os.path.isfile(filename):
+			raise FileNotFoundError(filename)
+		with open(filename, encoding="UTF-8") as fp:
+			parsed_requirements, comments = parse_requirements(fp.read().splitlines())
+		all_parsed_requirements.extend(parsed_requirements)
+		all_comments.extend(comments)
+	return all_parsed_requirements, all_comments
+
+
 class RequirementsMetadataHook(MetadataHookInterface):
 	"""
 	Hatch metadata hook to populate 'project.depencencies' from a ``requirements.txt`` file.
@@ -80,12 +107,21 @@ class RequirementsMetadataHook(MetadataHookInterface):
 		Update the project table's metadata.
 		"""
 
-		filename = self.config.get("filename", "requirements.txt")
-		if not os.path.isfile(filename):
-			raise FileNotFoundError(filename)
+		# 'filename' is the old way to specify a single requirements file. 'files' is preferred.
+		filename: Optional[str] = self.config.get("filename", None)
+		files: Optional[List[str]] = self.config.get("files", None)
+		if filename is None:
+			if files is None:
+				files = ["requirements.txt"]
+		else:
+			if files is not None:
+				raise ValueError(
+						"Cannot specify both 'filename' and 'files' in "
+						"[tool.hatch.metadata.hooks.requirements_txt]."
+						)
+			files = [filename]
 
-		with open(filename, encoding="UTF-8") as fp:
-			requirements, _ = parse_requirements(fp.read().splitlines())
+		requirements, _ = load_requirements_files(files)
 
 		if "dependencies" in metadata:
 			raise ValueError("'dependencies' is already listed in the 'project' table.")
@@ -93,6 +129,19 @@ class RequirementsMetadataHook(MetadataHookInterface):
 			raise ValueError("'dependencies' is not listed in 'project.dynamic'.")
 		else:
 			metadata["dependencies"] = [str(r) for r in requirements]
+
+		# Also handle optional-dependencies if present
+		optional_dependency_files: Optional[Dict[str, List[str]]] = self.config.get("optional-dependencies", None)
+		if optional_dependency_files is not None:
+			if "optional-dependencies" in metadata:
+				raise ValueError("'optional-dependencies' is already listed in the 'project' table.")
+			elif "optional-dependencies" not in metadata.get("dynamic", []):
+				raise ValueError("'optional-dependencies' is not listed in 'project.dynamic'.")
+			else:
+				metadata["optional-dependencies"] = {}
+				for feature_name, files in optional_dependency_files.items():
+					requirements, _ = load_requirements_files(files)
+					metadata["optional-dependencies"][feature_name] = [str(r) for r in requirements]
 
 
 @hookimpl
