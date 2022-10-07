@@ -113,6 +113,26 @@ files = ["requirements/dev.txt", "requirements/docs.txt", "requirements/tests.tx
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
 	assert info.requires_dist == ["mkdocs", "pre-commit", "pytest"]
 
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]',
+			'dynamic = ["dependencies", "optional-dependencies"]',
+			) + """
+[tool.hatch.metadata.hooks.requirements_txt]
+files = []
+
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev = ["requirements/dev.txt"]
+docs = ["requirements/docs.txt"]
+tests = ["requirements/tests.txt"]
+"""
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.provides_extras == ["dev", "docs", "tests"]
+	assert info.requires_dist == [
+			"pre-commit; extra == 'dev'",
+			"mkdocs; extra == 'docs'",
+			"pytest; extra == 'tests'",
+			]
+
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_optional_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
