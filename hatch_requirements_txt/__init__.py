@@ -28,6 +28,7 @@ Hatchling plugin to read project dependencies from ``requirements.txt``.
 
 # stdlib
 import os
+import warnings
 from typing import Dict, Iterable, List, Optional, Tuple, Type
 
 # 3rd party
@@ -110,9 +111,17 @@ class RequirementsMetadataHook(MetadataHookInterface):
 		# 'filename' is the old way to specify a single requirements file. 'files' is preferred.
 		filename: Optional[str] = self.config.get("filename", None)
 		files: Optional[List[str]] = self.config.get("files", None)
+		defaulted_to_requirements_txt: bool = False
 		if filename is None:
 			if files is None:
 				files = ["requirements.txt"]
+				defaulted_to_requirements_txt = True
+				warnings.warn(
+						"Please explicitly specify 'files' in "
+						"[tool.hatch.metadata.hooks.requirements_txt]. Defaulting to "
+						"['requirements.txt'] is deprecated.",
+						DeprecationWarning
+						)
 		else:
 			if files is not None:
 				raise ValueError(
@@ -120,14 +129,25 @@ class RequirementsMetadataHook(MetadataHookInterface):
 						"[tool.hatch.metadata.hooks.requirements_txt]."
 						)
 			files = [filename]
+			warnings.warn(
+					"The 'filename' option in [tool.hatch.metadata.hooks.requirements_txt] "
+					"is deprecated. Please instead use the list 'files'.",
+					DeprecationWarning
+					)
 
-		requirements, _ = load_requirements_files(files)
-
-		if "dependencies" in metadata:
-			raise ValueError("'dependencies' is already listed in the 'project' table.")
-		elif "dependencies" not in metadata.get("dynamic", []):
-			raise ValueError("'dependencies' is not listed in 'project.dynamic'.")
+		if "dependencies" not in metadata.get("dynamic", []):
+			if files != []:
+				message = "'dependencies' is not listed in 'project.dynamic'."
+				if defaulted_to_requirements_txt:
+					message += (
+							" (If you don't want to use a requirements.txt for dependencies, "
+							"then set 'files = []' in [tool.hatch.metadata.hooks.requirements_txt].)"
+							)
+				raise ValueError(message)
+		elif "dependencies" in metadata:
+			raise ValueError("'dependencies' is already listed in [project].")
 		else:
+			requirements, _ = load_requirements_files(files)
 			metadata["dependencies"] = [str(r) for r in requirements]
 
 		# Also handle optional-dependencies if present

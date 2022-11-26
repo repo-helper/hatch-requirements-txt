@@ -111,7 +111,7 @@ def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 	dist_dir.maybe_make()
 
 	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('dynamic = ["dependencies"]', "dependencies = []")
+			pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["dependencies"]\ndependencies = []')
 			)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
@@ -119,7 +119,7 @@ def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match="^'dependencies' is already listed in the 'project' table.$"):
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=r"^'dependencies' is already listed in \[project\].$"):
 		wheel_file = build_func(dist_dir)
 
 
