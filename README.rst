@@ -111,36 +111,6 @@ hatch-requirements-txt
 
 
 
-Installation
---------------
-
-.. start installation
-
-``hatch-requirements-txt`` can be installed from PyPI or Anaconda.
-
-To install with ``pip``:
-
-.. code-block:: bash
-
-	$ python -m pip install hatch-requirements-txt
-
-To install with ``conda``:
-
-	* First add the required channels
-
-	.. code-block:: bash
-
-		$ conda config --add channels https://conda.anaconda.org/conda-forge
-
-	* Then install
-
-	.. code-block:: bash
-
-		$ conda install hatch-requirements-txt
-
-.. end installation
-
-
 Usage
 ========
 
