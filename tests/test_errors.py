@@ -29,7 +29,7 @@ Homepage = "https://github.com/pypa/sampleproject"
 "Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
 
 [tool.hatch.metadata.hooks.requirements_txt]
-filename = "requirements.txt"
+files = ["requirements.txt"]
 """
 
 
@@ -158,7 +158,7 @@ def test_filename_and_files(tmp_pathplus: PathPlus, build_func: Callable):
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
-	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml + 'files = ["requirements.txt"]\n')
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml + 'filename = "requirements.txt"\n')
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
@@ -179,7 +179,7 @@ def test_filename_parameter_not_str(tmp_pathplus: PathPlus, build_func: Callable
 	dist_dir.maybe_make()
 
 	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('filename = "requirements.txt"', 'filename = ["requirements.txt"]')
+			pyproject_toml.replace('files = ["requirements.txt"]', 'filename = ["requirements.txt"]')
 			)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
@@ -200,7 +200,7 @@ def test_files_parameter_not_list(tmp_pathplus: PathPlus, build_func: Callable):
 	dist_dir.maybe_make()
 
 	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('filename = "requirements.txt"', 'files = "requirements.txt"')
+			pyproject_toml.replace('files = ["requirements.txt"]', 'files = "requirements.txt"')
 			)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
