@@ -243,3 +243,45 @@ def test_parse_requirements(
 		requirements: List[str],
 		):
 	advanced_data_regression.check(sorted(map(str, parse_requirements(requirements)[0])))
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_using_project_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]', """
+dynamic = []
+dependencies = ["foo", "bar"]
+   """
+			) + """
+[tool.hatch.metadata.hooks.requirements_txt]
+files = []
+"""
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "foo"]
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_using_project_deps_and_optional_deps(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]',
+			"""
+dynamic = ["optional-dependencies"]
+dependencies = ["foo", "bar"]
+   """
+			) + """
+[tool.hatch.metadata.hooks.requirements_txt]
+files = []
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+crypto = ["requirements-crypto.txt"]
+"""
+	(tmp_pathplus / "requirements-crypto.txt").write_lines(["PyJWT", "cryptography"])
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.provides_extras == ["crypto"]
+	assert info.requires_dist == [
+			"bar",
+			"foo",
+			"cryptography; extra == 'crypto'",
+			"pyjwt; extra == 'crypto'",
+			]
