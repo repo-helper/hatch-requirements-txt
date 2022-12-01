@@ -84,6 +84,28 @@ def test_not_dynamic(tmp_pathplus: PathPlus, build_func: Callable):
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_dynamic_no_explicit_files(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(
+			pyproject_toml.replace('dynamic = ["dependencies"]', '').replace('files = ["requirements.txt"]', '')
+			)
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=
+		r"^'dependencies' is not listed in 'project.dynamic'."
+		r" \(If you don't want to use a requirements.txt for dependencies, "
+		r"then set 'files = \[\]' in \[tool.hatch.metadata.hooks.requirements_txt\].\)$"
+		):
+		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_optional_not_dynamic(tmp_pathplus: PathPlus, build_func: Callable):
 
 	dist_dir = tmp_pathplus / "dist"
