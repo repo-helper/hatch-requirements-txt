@@ -212,3 +212,46 @@ def test_files_parameter_not_list(tmp_pathplus: PathPlus, build_func: Callable):
 		"^Requirements files must be a list, but got <class 'str'>: requirements.txt.$"
 	)):
 		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_filename_deprecation(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(
+			pyproject_toml.replace('files = ["requirements.txt"]', 'filename = "requirements.txt"')
+			)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.warns(DeprecationWarning, match=(
+		r"^The 'filename' option in \[tool.hatch.metadata.hooks.requirements_txt\] "
+		r"is deprecated. Please instead use the list 'files'.$"
+	)):
+		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_no_files_or_filename_deprecation(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_toml.replace('files = ["requirements.txt"]', ''))
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.warns(DeprecationWarning, match=(
+		r"Please explicitly specify 'files' in "
+		r"\[tool.hatch.metadata.hooks.requirements_txt\]. Defaulting to "
+		r"\['requirements.txt'\] is deprecated."
+	)):
+		wheel_file = build_func(dist_dir)
