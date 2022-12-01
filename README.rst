@@ -147,7 +147,7 @@ Usage
 In your ``pyproject.toml`` make the following changes:
 
 * Append ``hatch-requirements-txt`` to ``build-system.requires``.
-* Append ``dependencies`` to ``project.dynamic``.
+* Append ``"dependencies"`` to ``project.dynamic``.
 * Add the following table:
 
 .. code-block:: toml
@@ -164,3 +164,7 @@ Optionally, you can also define groups of `optional dependencies <https://hatch.
 	crypto = ["requirements-crypto.txt"]
 	fastjson = ["requirements-fastjson.txt"]
 	cli = ["requirements-cli.txt"]
+
+It is possible to define dependencies instead in ``project.dependencies`` by setting ``files = []``
+and removing ``"dependencies"`` from ``project.dynamic``. (This is useful for defining just the
+optional dependencies via requirements files.)
