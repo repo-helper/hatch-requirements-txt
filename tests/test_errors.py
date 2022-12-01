@@ -97,11 +97,11 @@ def test_not_dynamic_no_explicit_files(tmp_pathplus: PathPlus, build_func: Calla
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
 		r"^'dependencies' is not listed in 'project.dynamic'."
 		r" \(If you don't want to use a requirements.txt for dependencies, "
 		r"then set 'files = \[\]' in \[tool.hatch.metadata.hooks.requirements_txt\].\)$"
-		):
+		)):
 		wheel_file = build_func(dist_dir)
 
 
