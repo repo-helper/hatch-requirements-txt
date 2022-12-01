@@ -78,7 +78,7 @@ def test_build_unspecified(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
 [tool.hatch.metadata.hooks.requirements_txt]
-# filename = "requirements.txt"
+# files = ["requirements.txt"]
 """
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
@@ -139,7 +139,7 @@ def test_optional_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
 [tool.hatch.metadata.hooks.requirements_txt]
-filename = "requirements.txt"
+files = ["requirements.txt"]
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 crypto = ["requirements-crypto.txt"]
