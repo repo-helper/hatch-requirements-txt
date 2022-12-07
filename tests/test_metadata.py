@@ -135,6 +135,40 @@ tests = ["requirements/tests.txt"]
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_dynamic_no_explicit_files(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	pyproject_toml = pyproject_toml_header.replace('dynamic = ["dependencies"]', '')
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ()
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_dynamic_project_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]', 'dependencies = ["foo", "bar", "baz>1"]'
+			)
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "baz>1", "foo"]
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_optional_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
@@ -253,10 +287,7 @@ def test_using_project_dependencies(tmp_pathplus: PathPlus, build_func: Callable
 dynamic = []
 dependencies = ["foo", "bar"]
    """
-			) + """
-[tool.hatch.metadata.hooks.requirements_txt]
-files = []
-"""
+			)
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
 	assert info.requires_dist == ["bar", "foo"]
 
@@ -271,8 +302,6 @@ dynamic = ["optional-dependencies"]
 dependencies = ["foo", "bar"]
    """
 			) + """
-[tool.hatch.metadata.hooks.requirements_txt]
-files = []
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 crypto = ["requirements-crypto.txt"]
 """
