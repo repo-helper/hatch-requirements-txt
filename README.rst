@@ -164,7 +164,3 @@ Optionally, you can also define groups of `optional dependencies <https://hatch.
 	crypto = ["requirements-crypto.txt"]
 	fastjson = ["requirements-fastjson.txt"]
 	cli = ["requirements-cli.txt"]
-
-It is possible to define dependencies instead in ``project.dependencies`` by setting ``files = []``
-and removing ``"dependencies"`` from ``project.dynamic``. (This is useful for defining just the
-optional dependencies via requirements files.)
