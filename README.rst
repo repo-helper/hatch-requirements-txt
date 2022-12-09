@@ -125,7 +125,23 @@ In your ``pyproject.toml`` make the following changes:
 	[tool.hatch.metadata.hooks.requirements_txt]
 	files = ["requirements.txt"]
 
-Optionally, you can also define groups of `optional dependencies <https://hatch.pypa.io/latest/config/dependency/#features>`_
+The resulting ``pyproject.toml`` should look something like:
+
+.. code-block:: toml
+
+	[build-system]
+	requires = ["hatchling", "hatch-requirements-txt"]
+	build-backend = "hatchling.build"
+
+	[project]
+	name = "my-project"
+	version = "1.0.0"
+	dynamic = ["dependencies"]
+
+	[tool.hatch.metadata.hooks.requirements_txt]
+	files = ["requirements.txt"]
+
+You can also define groups of `optional dependencies <https://hatch.pypa.io/latest/config/dependency/#features>`_
 (also known as "features") by appending ``optional-dependencies`` to ``project.dynamic`` and adding a table like:
 
 .. code-block:: toml
