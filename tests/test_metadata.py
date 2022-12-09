@@ -78,7 +78,7 @@ def test_build_unspecified(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
 [tool.hatch.metadata.hooks.requirements_txt]
-# filename = "requirements.txt"
+# files = ["requirements.txt"]
 """
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
@@ -135,11 +135,45 @@ tests = ["requirements/tests.txt"]
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_dynamic_no_explicit_files(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	pyproject_toml = pyproject_toml_header.replace('dynamic = ["dependencies"]', '')
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ()
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_dynamic_project_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]', 'dependencies = ["foo", "bar", "baz>1"]'
+			)
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "baz>1", "foo"]
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_optional_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header + """
 [tool.hatch.metadata.hooks.requirements_txt]
-filename = "requirements.txt"
+files = ["requirements.txt"]
 
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 crypto = ["requirements-crypto.txt"]
@@ -243,3 +277,40 @@ def test_parse_requirements(
 		requirements: List[str],
 		):
 	advanced_data_regression.check(sorted(map(str, parse_requirements(requirements)[0])))
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_using_project_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]', """
+dynamic = []
+dependencies = ["foo", "bar"]
+   """
+			)
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.requires_dist == ["bar", "foo"]
+
+
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_using_project_deps_and_optional_deps(tmp_pathplus: PathPlus, build_func: Callable):
+
+	pyproject_toml = pyproject_toml_header.replace(
+			'dynamic = ["dependencies"]',
+			"""
+dynamic = ["optional-dependencies"]
+dependencies = ["foo", "bar"]
+   """
+			) + """
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+crypto = ["requirements-crypto.txt"]
+"""
+	(tmp_pathplus / "requirements-crypto.txt").write_lines(["PyJWT", "cryptography"])
+	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+	assert info.provides_extras == ["crypto"]
+	assert info.requires_dist == [
+			"bar",
+			"foo",
+			"cryptography; extra == 'crypto'",
+			"pyjwt; extra == 'crypto'",
+			]

@@ -28,6 +28,7 @@ Hatchling plugin to read project dependencies from ``requirements.txt``.
 
 # stdlib
 import os
+import warnings
 from typing import Dict, Iterable, List, Optional, Tuple, Type
 
 # 3rd party
@@ -110,38 +111,72 @@ class RequirementsMetadataHook(MetadataHookInterface):
 		# 'filename' is the old way to specify a single requirements file. 'files' is preferred.
 		filename: Optional[str] = self.config.get("filename", None)
 		files: Optional[List[str]] = self.config.get("files", None)
-		if filename is None:
-			if files is None:
-				files = ["requirements.txt"]
-		else:
+		defaulted_to_requirements_txt: bool = False
+
+		if "dependencies" not in metadata.get("dynamic", []):
+			# Dependencies are not declared dynamic
+			if filename is not None:
+				raise ValueError(
+						"Cannot specify 'filename' in [tool.hatch.metadata.hooks.requirements_txt] "
+						"when 'dependencies' is not listed in 'project.dynamic'."
+						)
 			if files is not None:
 				raise ValueError(
-						"Cannot specify both 'filename' and 'files' in "
-						"[tool.hatch.metadata.hooks.requirements_txt]."
+						"Cannot specify 'files' in [tool.hatch.metadata.hooks.requirements_txt] "
+						"when 'dependencies' is not listed in 'project.dynamic'."
 						)
-			files = [filename]
-
-		requirements, _ = load_requirements_files(files)
-
-		if "dependencies" in metadata:
-			raise ValueError("'dependencies' is already listed in the 'project' table.")
-		elif "dependencies" not in metadata.get("dynamic", []):
-			raise ValueError("'dependencies' is not listed in 'project.dynamic'.")
 		else:
+			# Dependencies are declared dynamic
+			if "dependencies" in metadata:
+				raise ValueError("'dependencies' is dynamic but already listed in [project].")
+			if filename is None:
+				if files is None:
+					files = ["requirements.txt"]
+					defaulted_to_requirements_txt = True
+					warnings.warn(
+							"Please explicitly specify 'files' in "
+							"[tool.hatch.metadata.hooks.requirements_txt]. Defaulting to "
+							"['requirements.txt'] is deprecated.",
+							DeprecationWarning
+							)
+			else:
+				if files is not None:
+					raise ValueError(
+							"Cannot specify both 'filename' and 'files' in "
+							"[tool.hatch.metadata.hooks.requirements_txt]."
+							)
+				files = [filename]
+				warnings.warn(
+						"The 'filename' option in [tool.hatch.metadata.hooks.requirements_txt] "
+						"is deprecated. Please instead use the list 'files'.",
+						DeprecationWarning
+						)
+			requirements, _ = load_requirements_files(files)
 			metadata["dependencies"] = [str(r) for r in requirements]
 
 		# Also handle optional-dependencies if present
 		optional_dependency_files: Optional[Dict[str, List[str]]] = self.config.get("optional-dependencies", None)
-		if optional_dependency_files is not None:
+
+		if "optional-dependencies" not in metadata.get("dynamic", []):
+			# Optional dependencies are not declared dynamic
+			if optional_dependency_files is not None:
+				raise ValueError(
+						"Cannot specify 'optional-dependencies' in [tool.hatch.metadata.hooks.requirements_txt] "
+						"when 'optional-dependencies' is not listed in 'project.dynamic'."
+						)
+		else:
+			# Optional dependencies are declared dynamic
 			if "optional-dependencies" in metadata:
-				raise ValueError("'optional-dependencies' is already listed in the 'project' table.")
-			elif "optional-dependencies" not in metadata.get("dynamic", []):
-				raise ValueError("'optional-dependencies' is not listed in 'project.dynamic'.")
+				raise ValueError("'optional-dependencies' is dynamic but already listed in [project].")
+			if optional_dependency_files is None:
+				# optional_dependency_files is probably being set by another plugin.
+				pass
 			else:
-				metadata["optional-dependencies"] = {}
+				optional_deps_result = {}
 				for feature_name, files in optional_dependency_files.items():
 					requirements, _ = load_requirements_files(files)
-					metadata["optional-dependencies"][feature_name] = [str(r) for r in requirements]
+					optional_deps_result[feature_name] = [str(r) for r in requirements]
+				metadata["optional-dependencies"] = optional_deps_result
 
 
 @hookimpl

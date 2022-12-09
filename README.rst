@@ -117,7 +117,7 @@ Usage
 In your ``pyproject.toml`` make the following changes:
 
 * Append ``hatch-requirements-txt`` to ``build-system.requires``.
-* Append ``dependencies`` to ``project.dynamic``.
+* Append ``"dependencies"`` to ``project.dynamic``.
 * Add the following table:
 
 .. code-block:: toml
