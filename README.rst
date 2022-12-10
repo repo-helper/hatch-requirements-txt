@@ -94,7 +94,7 @@ hatch-requirements-txt
 .. |language| image:: https://img.shields.io/github/languages/top/repo-helper/hatch-requirements-txt
 	:alt: GitHub top language
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/repo-helper/hatch-requirements-txt/v0.2.0
+.. |commits-since| image:: https://img.shields.io/github/commits-since/repo-helper/hatch-requirements-txt/v0.3.0
 	:target: https://github.com/repo-helper/hatch-requirements-txt/pulse
 	:alt: GitHub commits since tagged version
 
