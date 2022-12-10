@@ -27,7 +27,8 @@ python_versions:
  - '3.8'
  - '3.9'
  - "3.10"
- - 3.11-dev
+ - "3.11"
+ - 3.12-dev
  - pypy36
  - pypy37
  - pypy38
