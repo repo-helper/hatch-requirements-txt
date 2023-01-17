@@ -216,10 +216,11 @@ def test_filename_parameter_not_str(tmp_pathplus: PathPlus, build_func: Callable
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(TypeError, match=(
-		r"^Requirements file \['requirements.txt'\] must be a string, but got <class 'list'>.$"
-	)):
-		wheel_file = build_func(dist_dir)
+	type_error_msg = r"^Requirements file \['requirements.txt'\] must be a string, but got <class 'list'>.$"
+	deprecation_warning_msg = r"The 'filename' option in \[tool.hatch.metadata.hooks.requirements_txt\] is deprecated. Please instead use the list 'files'"
+	with in_directory(tmp_pathplus):
+		with pytest.raises(TypeError, match=type_error_msg), pytest.warns(DeprecationWarning, match=deprecation_warning_msg):
+			build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])

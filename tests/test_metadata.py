@@ -69,7 +69,11 @@ def test_build_with_filename(tmp_pathplus: PathPlus, build_func: Callable):
 filename = "requirements.txt"
 """
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
-	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+
+	deprecation_warning_msg = r"The 'filename' option in \[tool.hatch.metadata.hooks.requirements_txt] is deprecated. Please instead use the list 'files'"
+	with pytest.warns(DeprecationWarning, match=deprecation_warning_msg):
+		info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+
 	assert info.requires_dist == ["bar", "baz>1", "foo"]
 
 
@@ -81,7 +85,11 @@ def test_build_unspecified(tmp_pathplus: PathPlus, build_func: Callable):
 # files = ["requirements.txt"]
 """
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
-	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+
+	deprecation_warning_msg = r"Please explicitly specify 'files' in \[tool.hatch.metadata.hooks.requirements_txt]. Defaulting to \['requirements.txt'] is deprecated"
+	with pytest.warns(DeprecationWarning, match=deprecation_warning_msg):
+		info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
+
 	assert info.requires_dist == ["bar", "baz>1", "foo"]
 
 
