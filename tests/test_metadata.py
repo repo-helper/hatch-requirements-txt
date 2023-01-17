@@ -2,7 +2,7 @@
 from typing import Callable, List, Union
 
 # 3rd party
-import pkginfo  # type: ignore
+import pkginfo
 import pytest
 from coincidence.regressions import AdvancedDataRegressionFixture
 from domdf_python_tools.paths import PathPlus, in_directory
@@ -52,6 +52,7 @@ def get_pkginfo(
 	with in_directory(tmp_pathplus):
 		dist_filename = build_func(dist_dir)
 		dist_file = dist_dir / dist_filename
+		info: Union[pkginfo.SDist, pkginfo.Wheel]
 		if dist_filename.endswith(".whl"):
 			info = pkginfo.Wheel(dist_file)
 		elif dist_filename.endswith(".tar.gz"):
