@@ -113,6 +113,7 @@ def test_build_pip_compile_style(tmp_pathplus: PathPlus, build_func: Callable):
 files = ["requirements.txt"]
 """
 	(tmp_pathplus / "requirements.txt").write_lines([
+			"--index http://localhost:3141",
 			"alembic==1.9.1 \\",
 			"    --hash=sha256:a9781ed0979a20341c2cbb56bd22bd8db4fc1913f955e705444bd3a97c59fa32 \\",
 			"    --hash=sha256:f9f76e41061f5ebe27d4fe92600df9dd612521a7683f904dab328ba02cffa5a2",
