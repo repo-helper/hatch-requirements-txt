@@ -150,3 +150,27 @@ You can also define groups of `optional dependencies <https://hatch.pypa.io/late
 	crypto = ["requirements-crypto.txt"]
 	fastjson = ["requirements-fastjson.txt"]
 	cli = ["requirements-cli.txt"]
+
+Requirements file format
+============================
+
+``hatch-requirements-txt`` only supports a subset of the ``requirements.txt`` format_ supported by ``pip``.
+The following are supported:
+
+* requirement specifiers, per `PEP 508`_
+* ``--option`` options, both on their own line and after a requirement specifier.
+  Note however that the options are ignored and are not included in the metadata of sdists and wheels.
+* Comments, prefixed with a ``#``.
+
+The following are unsupported:
+
+* Editable install commands with the ``-e`` option,
+* References to other requirements or constraints files with the ``-r`` or ``-c`` options.
+* References to paths on the local filesystem, or URLs.
+
+**TL;DR**
+For best compatibility, ensure all lines in your ``requirements.txt`` files
+are valid PEP 508 requirements, or comments starting with a ``#``.
+
+.. _format: https://pip.pypa.io/en/stable/reference/requirements-file-format/
+.. _PEP 508: https://peps.python.org/pep-0508/
