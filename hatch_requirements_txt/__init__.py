@@ -28,6 +28,7 @@ Hatchling plugin to read project dependencies from ``requirements.txt``.
 
 # stdlib
 import os
+import re
 import warnings
 from typing import Dict, Iterable, List, Optional, Tuple, Type
 
@@ -45,6 +46,12 @@ __license__: str = "MIT License"
 __version__: str = "0.3.0"
 __email__: str = "dominic@davis-foster.co.uk"
 
+# Regular expression for matching comments at the end of requirements
+# From pip (pip/_internal/req/req_file.py#L45)
+COMMENT_RE = re.compile(r"(^|\s+)#.*$")
+
+PIP_COMMAND_RE = re.compile(r"\s+(-[A-Za-z]|--[A-Za-z]+)")
+
 
 def parse_requirements(requirements: Iterable[str]) -> Tuple[List[Requirement], List[str]]:
 	"""
@@ -61,7 +68,15 @@ def parse_requirements(requirements: Iterable[str]) -> Tuple[List[Requirement], 
 	for line in requirements:
 		if line.lstrip().startswith('#'):
 			comments.append(line)
+		elif line.lstrip().startswith('-'):
+			# Likely an argument to pip from a requirements.txt file intended for pip
+			# (e.g. from pip-compile)
+			pass
 		elif line:
+			# Strip comments from end of line
+			line = COMMENT_RE.sub('', line)
+			if '-' in line:
+				line = PIP_COMMAND_RE.split(line)[0]
 			req = Requirement(line)
 			req.name = canonicalize_name(req.name)
 			parsed_requirements.append(req)
@@ -90,7 +105,10 @@ def load_requirements_files(files: List[str]) -> Tuple[List[Requirement], List[s
 		if not os.path.isfile(filename):
 			raise FileNotFoundError(filename)
 		with open(filename, encoding="UTF-8") as fp:
-			parsed_requirements, comments = parse_requirements(fp.read().splitlines())
+			contents = fp.read()
+			# Unfold lines ending with \
+			contents = re.sub(r"\\\s*\n", ' ', contents)
+			parsed_requirements, comments = parse_requirements(contents.splitlines())
 		all_parsed_requirements.extend(parsed_requirements)
 		all_comments.extend(comments)
 	return all_parsed_requirements, all_comments
