@@ -151,6 +151,7 @@ You can also define groups of `optional dependencies <https://hatch.pypa.io/late
 	fastjson = ["requirements-fastjson.txt"]
 	cli = ["requirements-cli.txt"]
 
+
 Requirements file format
 ============================
 
@@ -158,9 +159,9 @@ Requirements file format
 The following are supported:
 
 * requirement specifiers, per `PEP 508`_
-* ``--option`` options, both on their own line and after a requirement specifier.
-  Note however that the options are ignored and are not included in the metadata of sdists and wheels.
 * Comments, prefixed with a ``#``.
+* ``--<option>`` options, both on their own line and after a requirement specifier.
+  Note however that the options themselves are ignored.
 
 The following are unsupported:
 
