@@ -106,7 +106,7 @@ def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Ca
 		r"^Cannot specify 'filename' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
 	)):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -130,7 +130,7 @@ dev = ["requirements-dev.txt"]
 		r"^Cannot specify 'optional-dependencies' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'optional-dependencies' is not listed in 'project.dynamic'.$"
 	)):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -149,7 +149,7 @@ def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
 	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=r"^'dependencies' is dynamic but already listed in \[project\].$"):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -178,7 +178,7 @@ test = ["pytest"]
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
 	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=r"^'optional-dependencies' is dynamic but already listed in \[project\].$"):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -198,7 +198,7 @@ def test_filename_and_files(tmp_pathplus: PathPlus, build_func: Callable):
 		"^Cannot specify both 'filename' and 'files' in "
 		"\\[tool.hatch.metadata.hooks.requirements_txt\\].$"
 	)):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -241,7 +241,7 @@ def test_files_parameter_not_list(tmp_pathplus: PathPlus, build_func: Callable):
 	with in_directory(tmp_pathplus), pytest.raises(TypeError, match=(
 		"^Requirements files must be a list, but got <class 'str'>: requirements.txt.$"
 	)):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -263,7 +263,7 @@ def test_filename_deprecation(tmp_pathplus: PathPlus, build_func: Callable):
 		r"^The 'filename' option in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"is deprecated. Please instead use the list 'files'.$"
 	)):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -284,4 +284,4 @@ def test_no_files_or_filename_deprecation(tmp_pathplus: PathPlus, build_func: Ca
 		r"\[tool.hatch.metadata.hooks.requirements_txt\]. Defaulting to "
 		r"\['requirements.txt'\] is deprecated."
 	)):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
