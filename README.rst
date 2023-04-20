@@ -102,7 +102,7 @@ hatch-requirements-txt
 	:target: https://github.com/repo-helper/hatch-requirements-txt/commit/master
 	:alt: GitHub last commit
 
-.. |maintained| image:: https://img.shields.io/maintenance/yes/2022
+.. |maintained| image:: https://img.shields.io/maintenance/yes/2023
 	:alt: Maintenance
 
 .. |pypi-downloads| image:: https://img.shields.io/pypi/dm/hatch-requirements-txt
