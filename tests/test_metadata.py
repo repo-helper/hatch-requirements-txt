@@ -6,7 +6,9 @@ import pkginfo
 import pytest
 from coincidence.regressions import AdvancedDataRegressionFixture
 from domdf_python_tools.paths import PathPlus, in_directory
+from hatchling.__about__ import __version__ as hatchling_version
 from hatchling.build import build_sdist, build_wheel
+from packaging.version import Version
 
 # this package
 from hatch_requirements_txt import parse_requirements
@@ -249,11 +251,15 @@ cli = ["requirements-cli.txt"]
 			])
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
 	assert info.provides_extras == ["cli", "crypto", "fastjson"]
+	colorama_dependency = "colorama; (platform_system == 'Windows') and extra == 'cli'"
+	# https://github.com/pypa/hatch/commit/2741233fcc19177a7a045d67a39077d828e31fd6
+	if Version(hatchling_version) < Version("1.20"):
+		colorama_dependency = "colorama; platform_system == 'Windows' and extra == 'cli'"
 	assert info.requires_dist == [
 			"bar",
 			"baz>1",
 			"foo",
-			"colorama; platform_system == 'Windows' and extra == 'cli'",
+			colorama_dependency,
 			"prompt-toolkit; extra == 'cli'",
 			"cryptography; extra == 'crypto'",
 			"pyjwt; extra == 'crypto'",
