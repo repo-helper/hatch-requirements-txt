@@ -163,7 +163,7 @@ The following are supported:
 * ``--<option>`` options, both on their own line and after a requirement specifier.
   Note however that the options themselves are ignored.
 
-The following are unsupported:
+The following are unsupported within ``requirements.txt`` files:
 
 * Editable install commands with the ``-e`` option,
 * References to other requirements or constraints files with the ``-r`` or ``-c`` options.
