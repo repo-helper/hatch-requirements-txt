@@ -22,7 +22,7 @@ jobs:
     runs-on: "macos-latest"
     continue-on-error: ${{ matrix.config.experimental }}
     env:
-      USING_COVERAGE: '3.6,3.7,3.8,3.9,3.10,3.11,3.12,3.13.0-alpha.2,pypy-3.7,pypy-3.8,pypy-3.9'
+      USING_COVERAGE: '3.6,3.7,3.8,3.9,3.10,3.11,3.12,3.13.0-alpha.3,pypy-3.7,pypy-3.8,pypy-3.9'
 
     strategy:
       fail-fast: False
@@ -35,14 +35,14 @@ jobs:
           - {python-version: "3.10", testenvs: "py310,build", experimental: False}
           - {python-version: "3.11", testenvs: "py311,build", experimental: False}
           - {python-version: "3.12", testenvs: "py312,build", experimental: False}
-          - {python-version: "3.13.0-alpha.2", testenvs: "py313-dev,build", experimental: True}
+          - {python-version: "3.13.0-alpha.3", testenvs: "py313-dev,build", experimental: True}
           - {python-version: "pypy-3.7", testenvs: "pypy37,build", experimental: False}
           - {python-version: "pypy-3.8", testenvs: "pypy38,build", experimental: False}
           - {python-version: "pypy-3.9", testenvs: "pypy39,build", experimental: True}
 
     steps:
       - name: Checkout 🛎️
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: Check for changed files
         if: startsWith(github.ref, 'refs/tags/') != true
@@ -57,7 +57,7 @@ jobs:
       - name: Setup Python 🐍
         id: setup-python
         if: ${{ steps.changes.outputs.code == 'true' || steps.changes.outcome == 'skipped' }}
-        uses: "actions/setup-python@v4"
+        uses: "actions/setup-python@v5"
         with:
           python-version: "${{ matrix.config.python-version }}"
 
