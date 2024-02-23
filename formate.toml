@@ -46,4 +46,4 @@ known_third_party = [
     "pytest_randomly",
     "pytest_timeout",
 ]
-known_first_party = "hatch_requirements_txt"
+known_first_party = [ "hatch_requirements_txt",]
