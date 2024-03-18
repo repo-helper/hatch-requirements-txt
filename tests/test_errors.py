@@ -3,9 +3,14 @@ from typing import Callable
 
 # 3rd party
 import pytest
+from domdf_python_tools.compat import importlib_metadata
 from domdf_python_tools.paths import PathPlus, in_directory
 from hatchling.build import build_sdist, build_wheel
 from packaging.requirements import InvalidRequirement
+from packaging.version import Version
+
+_hatchling_version = Version(importlib_metadata.version("hatchling"))
+hatchling_version = (_hatchling_version.major, _hatchling_version.minor)
 
 pyproject_toml = """
 [project]
@@ -66,6 +71,7 @@ def test_missing_invalid_requirements(tmp_pathplus: PathPlus, build_func: Callab
 		wheel_file = build_func(dist_dir)
 
 
+@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_not_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Callable):
 
@@ -87,12 +93,59 @@ def test_not_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Calla
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_in_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	(tmp_pathplus / "pyproject.toml").write_clean(
+			pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]')
+			)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+		r"^Cannot specify 'files' in \[tool.hatch.metadata.hooks.requirements_txt\] "
+		r"when 'dependencies' is not listed in 'project.dynamic'.$"
+	)):
+		wheel_file = build_func(dist_dir)
+
+
+@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Callable):
 
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
 	new_pyproject_toml = pyproject_toml.replace('dynamic = ["dependencies"]', '').replace(
+			'files = ["requirements.txt"]', 'filename = "requirements.txt"'
+			)
+	(tmp_pathplus / "pyproject.toml").write_clean(new_pyproject_toml)
+	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
+	(tmp_pathplus / "README.md").touch()
+	(tmp_pathplus / "LICENSE").touch()
+	(tmp_pathplus / "demo").maybe_make()
+	(tmp_pathplus / "demo" / "__init__.py").touch()
+
+	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+		r"^Cannot specify 'filename' in \[tool.hatch.metadata.hooks.requirements_txt\] "
+		r"when 'dependencies' is not listed in 'project.dynamic'.$"
+	)):
+		build_func(dist_dir)
+
+
+@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
+@pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
+def test_not_in_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Callable):
+
+	dist_dir = tmp_pathplus / "dist"
+	dist_dir.maybe_make()
+
+	new_pyproject_toml = pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]').replace(
 			'files = ["requirements.txt"]', 'filename = "requirements.txt"'
 			)
 	(tmp_pathplus / "pyproject.toml").write_clean(new_pyproject_toml)

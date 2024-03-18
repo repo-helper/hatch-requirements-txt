@@ -22,18 +22,30 @@ conda_channels:
 
 # Versions to run tests for
 python_versions:
- - '3.6'
- - '3.7'
- - '3.8'
- - '3.9'
- - "3.10"
- - "3.11"
- - "3.12"
- - 3.13-dev
- - pypy36
- - pypy37
- - pypy38
- - pypy39
+ '3.6':
+    matrix_exclude:
+     hatchling:
+      - 1.21
+ '3.7':
+    matrix_exclude:
+     hatchling:
+      - 1.21
+ '3.8':
+ '3.9':
+ "3.10":
+ "3.11":
+ "3.12":
+ 3.13-dev:
+ pypy36:
+    matrix_exclude:
+     hatchling:
+      - 1.21
+ pypy37:
+    matrix_exclude:
+     hatchling:
+      - 1.21
+ pypy38:
+ pypy39:
 
 classifiers:
  - 'Development Status :: 4 - Beta'
@@ -50,3 +62,8 @@ keywords:
 entry_points:
  hatch:
   - requirements_txt = hatch_requirements_txt
+
+third_party_version_matrix:
+  hatchling:
+   - 1.21
+   - latest
