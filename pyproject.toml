@@ -33,18 +33,20 @@ classifiers = [
 dependencies = [ "hatchling>=0.21.0", "packaging>=21.3",]
 dynamic = []
 
+[project.license]
+file = "LICENSE"
+
 [[project.authors]]
 name = "Dominic Davis-Foster"
 email = "dominic@davis-foster.co.uk"
-
-
-[project.license]
-file = "LICENSE"
 
 [project.urls]
 Homepage = "https://github.com/repo-helper/hatch-requirements-txt"
 "Issue Tracker" = "https://github.com/repo-helper/hatch-requirements-txt/issues"
 "Source Code" = "https://github.com/repo-helper/hatch-requirements-txt"
+
+[project.entry-points.hatch]
+requirements_txt = "hatch_requirements_txt"
 
 [tool.mkrecipe]
 conda-channels = [ "conda-forge", "domdfcoding",]
@@ -76,8 +78,15 @@ show_error_codes = true
 [tool.snippet-fmt]
 directives = [ "code-block",]
 
-[project.entry-points.hatch]
-requirements_txt = "hatch_requirements_txt"
+[tool.snippet-fmt.languages.python]
+reformat = true
+
+[tool.snippet-fmt.languages.TOML]
+reformat = true
+
+[tool.snippet-fmt.languages.ini]
+
+[tool.snippet-fmt.languages.json]
 
 [tool.dependency-dash."requirements.txt"]
 order = 10
@@ -95,16 +104,6 @@ exclude = [
     "tests",
     "doc-source",
 ]
-
-[tool.snippet-fmt.languages.python]
-reformat = true
-
-[tool.snippet-fmt.languages.TOML]
-reformat = true
-
-[tool.snippet-fmt.languages.ini]
-
-[tool.snippet-fmt.languages.json]
 
 [tool.hatch.build.sdist]
 include = [ "hatch_requirements_txt", "requirements.txt",]
