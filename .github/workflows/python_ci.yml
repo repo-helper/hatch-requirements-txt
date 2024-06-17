@@ -39,7 +39,7 @@ jobs:
           - {python-version: "pypy-3.6", testenvs: "pypy36-hatchlinglatest", experimental: False}
           - {python-version: "pypy-3.7", testenvs: "pypy37-hatchlinglatest,build", experimental: False}
           - {python-version: "pypy-3.8", testenvs: "pypy38-hatchling{1.21,latest},build", experimental: False}
-          - {python-version: "pypy-3.9", testenvs: "pypy39-hatchling{1.21,latest},build", experimental: True}
+          - {python-version: "pypy-3.9-v7.3.15", testenvs: "pypy39-hatchling{1.21,latest},build", experimental: True}
 
     steps:
       - name: Checkout 🛎️
