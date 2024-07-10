@@ -129,7 +129,6 @@ class RequirementsMetadataHook(MetadataHookInterface):
 		# 'filename' is the old way to specify a single requirements file. 'files' is preferred.
 		filename: Optional[str] = self.config.get("filename", None)
 		files: Optional[List[str]] = self.config.get("files", None)
-		defaulted_to_requirements_txt: bool = False
 
 		if "dependencies" not in metadata.get("dynamic", []):
 			# Dependencies are not declared dynamic
@@ -150,7 +149,6 @@ class RequirementsMetadataHook(MetadataHookInterface):
 			if filename is None:
 				if files is None:
 					files = ["requirements.txt"]
-					defaulted_to_requirements_txt = True
 					warnings.warn(
 							"Please explicitly specify 'files' in "
 							"[tool.hatch.metadata.hooks.requirements_txt]. Defaulting to "
