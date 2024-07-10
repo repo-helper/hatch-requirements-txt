@@ -138,7 +138,6 @@ def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Ca
 		build_func(dist_dir)
 
 
-@pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
 def test_not_in_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Callable):
 
