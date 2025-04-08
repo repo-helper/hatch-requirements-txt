@@ -22,10 +22,6 @@ conda_channels:
 
 # Versions to run tests for
 python_versions:
- '3.6':
-    matrix_exclude:
-     hatchling:
-      - 1.21
  '3.7':
     matrix_exclude:
      hatchling:
@@ -35,11 +31,7 @@ python_versions:
  "3.10":
  "3.11":
  "3.12":
- 3.13-dev:
- pypy36:
-    matrix_exclude:
-     hatchling:
-      - 1.21
+ "3.13":
  pypy37:
     matrix_exclude:
      hatchling:
