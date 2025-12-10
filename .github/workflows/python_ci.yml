@@ -18,8 +18,8 @@ permissions:
 
 jobs:
   tests:
-    name: "windows-2019 / Python ${{ matrix.config.python-version }}"
-    runs-on: "windows-2019"
+    name: "windows-2022 / Python ${{ matrix.config.python-version }}"
+    runs-on: "windows-2022"
     continue-on-error: ${{ matrix.config.experimental }}
     env:
       USING_COVERAGE: '3.7,3.8,3.9,3.10,3.11,3.12,3.13,pypy-3.7,pypy-3.8,pypy-3.9'
@@ -36,8 +36,8 @@ jobs:
           - {python-version: "3.12", testenvs: "py312-hatchling{1.21,latest},build", experimental: False}
           - {python-version: "3.13", testenvs: "py313-hatchling{1.21,latest},build", experimental: False}
           - {python-version: "pypy-3.7", testenvs: "pypy37-hatchlinglatest,build", experimental: False}
-          - {python-version: "pypy-3.8", testenvs: "pypy38-hatchling{1.21,latest},build", experimental: False}
-          - {python-version: "pypy-3.9-v7.3.15", testenvs: "pypy39-hatchling{1.21,latest},build", experimental: True}
+          - {python-version: "pypy-3.8", testenvs: "pypy38-hatchling{1.21,latest}", experimental: False}
+          - {python-version: "pypy-3.9-v7.3.15", testenvs: "pypy39-hatchling{1.21,latest}", experimental: True}
 
     steps:
       - name: Checkout 🛎️
