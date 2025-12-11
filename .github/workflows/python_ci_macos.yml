@@ -37,7 +37,7 @@ jobs:
           - {python-version: "3.13", os-ver: "14", testenvs: "py313-hatchling{1.21,latest},build", experimental: False}
           - {python-version: "pypy-3.7", os-ver: "15-intel", testenvs: "pypy37-hatchlinglatest,build", experimental: False}
           - {python-version: "pypy-3.8", os-ver: "14", testenvs: "pypy38-hatchling{1.21,latest},build", experimental: False}
-          - {python-version: "pypy-3.9", os-ver: "14", testenvs: "pypy39-hatchling{1.21,latest},build", experimental: True}
+          - {python-version: "pypy-3.9", os-ver: "14", testenvs: "pypy39-hatchling{1.21,latest}", experimental: True}
 
     steps:
       - name: Checkout 🛎️
