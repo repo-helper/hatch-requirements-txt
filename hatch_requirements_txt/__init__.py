@@ -124,6 +124,8 @@ class RequirementsMetadataHook(MetadataHookInterface):
 	def update(self, metadata: dict) -> None:
 		"""
 		Update the project table's metadata.
+
+		:param metadata:
 		"""
 
 		# 'filename' is the old way to specify a single requirements file. 'files' is preferred.
