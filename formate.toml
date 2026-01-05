@@ -27,21 +27,6 @@ lines_between_types = 0
 use_parentheses = true
 remove_redundant_aliases = true
 default_section = "THIRDPARTY"
-known_third_party = [
-    "coincidence",
-    "coverage",
-    "coverage_pyver_pragma",
-    "dist_meta",
-    "domdf_python_tools",
-    "hatchling",
-    "importlib_metadata",
-    "packaging",
-    "pkginfo",
-    "pytest",
-    "pytest_cov",
-    "pytest_randomly",
-    "pytest_timeout",
-]
 known_first_party = [ "hatch_requirements_txt",]
 
 [config]
