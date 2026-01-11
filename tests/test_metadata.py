@@ -95,7 +95,7 @@ allow-direct-references = true
 			"bar",
 			"# fizz",
 			"baz>1  # this is a comment",
-			"pip@ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686"
+			"pip@ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686",
 			])
 
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
@@ -103,7 +103,7 @@ allow-direct-references = true
 			"bar",
 			"baz>1",
 			"foo",
-			"pip@ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686"
+			"pip@ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686",
 			]
 
 
@@ -217,7 +217,8 @@ def test_not_dynamic_project_dependencies(tmp_pathplus: PathPlus, build_func: Ca
 	dist_dir.maybe_make()
 
 	pyproject_toml = pyproject_toml_header.replace(
-			'dynamic = ["dependencies"]', 'dependencies = ["foo", "bar", "baz>1"]'
+			'dynamic = ["dependencies"]',
+			'dependencies = ["foo", "bar", "baz>1"]',
 			)
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
@@ -241,13 +242,15 @@ fastjson = ["requirements-fastjson.txt"]
 cli = ["requirements-cli.txt"]
 """
 	pyproject_toml = pyproject_toml.replace(
-			'dynamic = ["dependencies"]', 'dynamic = ["dependencies", "optional-dependencies"]'
+			'dynamic = ["dependencies"]',
+			'dynamic = ["dependencies", "optional-dependencies"]',
 			)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
 	(tmp_pathplus / "requirements-crypto.txt").write_lines(["PyJWT", "cryptography"])
 	(tmp_pathplus / "requirements-fastjson.txt").write_lines(["orjson"])
 	(tmp_pathplus / "requirements-cli.txt").write_lines([
-			"prompt-toolkit", "colorama; platform_system == 'Windows'"
+			"prompt-toolkit",
+			"colorama; platform_system == 'Windows'",
 			])
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
 	assert info.provides_extras == ["cli", "crypto", "fastjson"]
@@ -263,7 +266,7 @@ cli = ["requirements-cli.txt"]
 			"prompt-toolkit; extra == 'cli'",
 			"cryptography; extra == 'crypto'",
 			"pyjwt; extra == 'crypto'",
-			"orjson; extra == 'fastjson'"
+			"orjson; extra == 'fastjson'",
 			]
 
 
@@ -334,7 +337,7 @@ requirements_c = [
 				pytest.param(tuple(requirements_a), id="tuple(a)"),
 				pytest.param(tuple(requirements_b), id="tuple(b)"),
 				pytest.param(tuple(requirements_c), id="tuple(c)"),
-				]
+				],
 		)
 def test_parse_requirements(
 		advanced_data_regression: AdvancedDataRegressionFixture,
@@ -347,10 +350,11 @@ def test_parse_requirements(
 def test_using_project_dependencies(tmp_pathplus: PathPlus, build_func: Callable):
 
 	pyproject_toml = pyproject_toml_header.replace(
-			'dynamic = ["dependencies"]', """
+			'dynamic = ["dependencies"]',
+			"""
 dynamic = []
 dependencies = ["foo", "bar"]
-   """
+   """,
 			)
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
 	assert info.requires_dist == ["bar", "foo"]
@@ -364,7 +368,7 @@ def test_using_project_deps_and_optional_deps(tmp_pathplus: PathPlus, build_func
 			"""
 dynamic = ["optional-dependencies"]
 dependencies = ["foo", "bar"]
-   """
+   """,
 			) + """
 [tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
 crypto = ["requirements-crypto.txt"]

@@ -85,10 +85,12 @@ def test_not_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Calla
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		ValueError, match=(
 		r"^Cannot specify 'files' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
-	)):
+		),
+	):
 		wheel_file = build_func(dist_dir)
 
 
@@ -98,19 +100,20 @@ def test_not_in_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Ca
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
-	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]')
-			)
+	pyproject_data = pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]')
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_data)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		ValueError, match=(
 		r"^Cannot specify 'files' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
-	)):
+		),
+	):
 		wheel_file = build_func(dist_dir)
 
 
@@ -122,7 +125,8 @@ def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Ca
 	dist_dir.maybe_make()
 
 	new_pyproject_toml = pyproject_toml.replace('dynamic = ["dependencies"]', '').replace(
-			'files = ["requirements.txt"]', 'filename = "requirements.txt"'
+			'files = ["requirements.txt"]',
+			'filename = "requirements.txt"',
 			)
 	(tmp_pathplus / "pyproject.toml").write_clean(new_pyproject_toml)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
@@ -131,10 +135,12 @@ def test_not_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func: Ca
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		ValueError, match=(
 		r"^Cannot specify 'filename' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
-	)):
+		),
+	):
 		build_func(dist_dir)
 
 
@@ -145,7 +151,8 @@ def test_not_in_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func:
 	dist_dir.maybe_make()
 
 	new_pyproject_toml = pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["classifiers"]').replace(
-			'files = ["requirements.txt"]', 'filename = "requirements.txt"'
+			'files = ["requirements.txt"]',
+			'filename = "requirements.txt"',
 			)
 	(tmp_pathplus / "pyproject.toml").write_clean(new_pyproject_toml)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "bar", "# fizz", "baz>1"])
@@ -154,10 +161,12 @@ def test_not_in_dynamic_but_filename_defined(tmp_pathplus: PathPlus, build_func:
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		ValueError, match=(
 		r"^Cannot specify 'filename' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
-	)):
+		),
+	):
 		build_func(dist_dir)
 
 
@@ -178,10 +187,12 @@ dev = ["requirements-dev.txt"]
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		ValueError, match=(
 		r"^Cannot specify 'optional-dependencies' in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"when 'optional-dependencies' is not listed in 'project.dynamic'.$"
-	)):
+		),
+	):
 		build_func(dist_dir)
 
 
@@ -191,9 +202,11 @@ def test_already_given(tmp_pathplus: PathPlus, build_func: Callable):
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
-	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('dynamic = ["dependencies"]', 'dynamic = ["dependencies"]\ndependencies = []')
+	pyproject_data = pyproject_toml.replace(
+			'dynamic = ["dependencies"]',
+			'dynamic = ["dependencies"]\ndependencies = []',
 			)
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_data)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
@@ -217,11 +230,12 @@ dev = ["requirements-dev.txt"]
 [project.optional-dependencies]
 test = ["pytest"]
 	"""
-	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.
-			replace('dynamic = ["dependencies"]', 'dynamic = ["dependencies", "optional-dependencies"]')
-			+ optional_dependencies_sections
+
+	pyproject_data = pyproject_toml.replace(
+			'dynamic = ["dependencies"]',
+			'dynamic = ["dependencies", "optional-dependencies"]',
 			)
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_data + optional_dependencies_sections)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "requirements-dev.txt").write_lines(["pre-commit"])
 	(tmp_pathplus / "README.md").touch()
@@ -246,10 +260,12 @@ def test_filename_and_files(tmp_pathplus: PathPlus, build_func: Callable):
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(ValueError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		ValueError, match=(
 		"^Cannot specify both 'filename' and 'files' in "
 		"\\[tool.hatch.metadata.hooks.requirements_txt\\].$"
-	)):
+		),
+	):
 		build_func(dist_dir)
 
 
@@ -259,9 +275,8 @@ def test_filename_parameter_not_str(tmp_pathplus: PathPlus, build_func: Callable
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
-	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('files = ["requirements.txt"]', 'filename = ["requirements.txt"]')
-			)
+	pyproject_data = pyproject_toml.replace('files = ["requirements.txt"]', 'filename = ["requirements.txt"]')
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_data)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
@@ -281,18 +296,19 @@ def test_files_parameter_not_list(tmp_pathplus: PathPlus, build_func: Callable):
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
-	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('files = ["requirements.txt"]', 'files = "requirements.txt"')
-			)
+	pyproject_data = pyproject_toml.replace('files = ["requirements.txt"]', 'files = "requirements.txt"')
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_data)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.raises(TypeError, match=(
+	with in_directory(tmp_pathplus), pytest.raises(
+		TypeError, match=(
 		"^Requirements files must be a list, but got <class 'str'>: requirements.txt.$"
-	)):
+		),
+	):
 		build_func(dist_dir)
 
 
@@ -302,19 +318,20 @@ def test_filename_deprecation(tmp_pathplus: PathPlus, build_func: Callable):
 	dist_dir = tmp_pathplus / "dist"
 	dist_dir.maybe_make()
 
-	(tmp_pathplus / "pyproject.toml").write_clean(
-			pyproject_toml.replace('files = ["requirements.txt"]', 'filename = "requirements.txt"')
-			)
+	pyproject_data = pyproject_toml.replace('files = ["requirements.txt"]', 'filename = "requirements.txt"')
+	(tmp_pathplus / "pyproject.toml").write_clean(pyproject_data)
 	(tmp_pathplus / "requirements.txt").write_lines(["Foo", "# fizz", "bar", "baz>1"])
 	(tmp_pathplus / "README.md").touch()
 	(tmp_pathplus / "LICENSE").touch()
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.warns(DeprecationWarning, match=(
+	with in_directory(tmp_pathplus), pytest.warns(
+		DeprecationWarning, match=(
 		r"^The 'filename' option in \[tool.hatch.metadata.hooks.requirements_txt\] "
 		r"is deprecated. Please instead use the list 'files'.$"
-	)):
+		),
+	):
 		build_func(dist_dir)
 
 
@@ -331,9 +348,11 @@ def test_no_files_or_filename_deprecation(tmp_pathplus: PathPlus, build_func: Ca
 	(tmp_pathplus / "demo").maybe_make()
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
-	with in_directory(tmp_pathplus), pytest.warns(DeprecationWarning, match=(
+	with in_directory(tmp_pathplus), pytest.warns(
+		DeprecationWarning, match=(
 		r"Please explicitly specify 'files' in "
 		r"\[tool.hatch.metadata.hooks.requirements_txt\]. Defaulting to "
 		r"\['requirements.txt'\] is deprecated."
-	)):
+		),
+	):
 		build_func(dist_dir)

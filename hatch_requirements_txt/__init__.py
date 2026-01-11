@@ -137,12 +137,12 @@ class RequirementsMetadataHook(MetadataHookInterface):
 			if filename is not None:
 				raise ValueError(
 						"Cannot specify 'filename' in [tool.hatch.metadata.hooks.requirements_txt] "
-						"when 'dependencies' is not listed in 'project.dynamic'."
+						"when 'dependencies' is not listed in 'project.dynamic'.",
 						)
 			if files is not None:
 				raise ValueError(
 						"Cannot specify 'files' in [tool.hatch.metadata.hooks.requirements_txt] "
-						"when 'dependencies' is not listed in 'project.dynamic'."
+						"when 'dependencies' is not listed in 'project.dynamic'.",
 						)
 		else:
 			# Dependencies are declared dynamic
@@ -155,19 +155,19 @@ class RequirementsMetadataHook(MetadataHookInterface):
 							"Please explicitly specify 'files' in "
 							"[tool.hatch.metadata.hooks.requirements_txt]. Defaulting to "
 							"['requirements.txt'] is deprecated.",
-							DeprecationWarning
+							DeprecationWarning,
 							)
 			else:
 				if files is not None:
 					raise ValueError(
 							"Cannot specify both 'filename' and 'files' in "
-							"[tool.hatch.metadata.hooks.requirements_txt]."
+							"[tool.hatch.metadata.hooks.requirements_txt].",
 							)
 				files = [filename]
 				warnings.warn(
 						"The 'filename' option in [tool.hatch.metadata.hooks.requirements_txt] "
 						"is deprecated. Please instead use the list 'files'.",
-						DeprecationWarning
+						DeprecationWarning,
 						)
 			requirements, _ = load_requirements_files(files)
 			metadata["dependencies"] = [str(r) for r in requirements]
@@ -180,7 +180,7 @@ class RequirementsMetadataHook(MetadataHookInterface):
 			if optional_dependency_files is not None:
 				raise ValueError(
 						"Cannot specify 'optional-dependencies' in [tool.hatch.metadata.hooks.requirements_txt] "
-						"when 'optional-dependencies' is not listed in 'project.dynamic'."
+						"when 'optional-dependencies' is not listed in 'project.dynamic'.",
 						)
 		else:
 			# Optional dependencies are declared dynamic
