@@ -48,10 +48,6 @@ Homepage = "https://github.com/repo-helper/hatch-requirements-txt"
 [project.entry-points.hatch]
 requirements_txt = "hatch_requirements_txt"
 
-[tool.mkrecipe]
-conda-channels = [ "conda-forge", "domdfcoding",]
-extras = "all"
-
 [tool.whey]
 base-classifiers = [
     "Development Status :: 4 - Beta",

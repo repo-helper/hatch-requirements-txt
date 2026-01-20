@@ -6,7 +6,6 @@ author: 'Dominic Davis-Foster'
 email: 'dominic@davis-foster.co.uk'
 username: 'repo-helper'
 assignee: 'domdfcoding'
-primary_conda_channel: "domdfcoding"
 version: '0.4.1'
 license: 'MIT'
 short_desc: "Hatchling plugin to read project dependencies from requirements.txt"
@@ -15,9 +14,7 @@ enable_docs: false
 min_coverage: 97.5
 use_hatch: true
 on_conda_forge: true
-
-conda_channels:
- - conda-forge
+enable_conda: false
 
 # Versions to run tests for
 python_versions:
