@@ -51,7 +51,7 @@ def test_missing_requirements_txt(tmp_pathplus: PathPlus, build_func: Callable):
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
 	with in_directory(tmp_pathplus), pytest.raises(FileNotFoundError, match=r"^requirements\.txt$"):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -68,7 +68,7 @@ def test_missing_invalid_requirements(tmp_pathplus: PathPlus, build_func: Callab
 	(tmp_pathplus / "demo" / "__init__.py").touch()
 
 	with in_directory(tmp_pathplus), pytest.raises(InvalidRequirement):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
@@ -91,7 +91,7 @@ def test_not_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Calla
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
 		),
 	):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
@@ -114,7 +114,7 @@ def test_not_in_dynamic_but_files_defined(tmp_pathplus: PathPlus, build_func: Ca
 		r"when 'dependencies' is not listed in 'project.dynamic'.$"
 		),
 	):
-		wheel_file = build_func(dist_dir)
+		build_func(dist_dir)
 
 
 @pytest.mark.xfail(hatchling_version >= (1, 22), reason="Metadata hooks no longer called if dynamic not set")
