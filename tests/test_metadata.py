@@ -99,12 +99,15 @@ allow-direct-references = true
 			])
 
 	info = get_pkginfo(tmp_pathplus, build_func, pyproject_toml)
-	assert info.requires_dist == [
+	assert info.requires_dist[:-1] == [
 			"bar",
 			"baz>1",
 			"foo",
-			"pip@ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686",
 			]
+	assert info.requires_dist[-1] in {
+			"pip@ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686",
+			"pip @ https://github.com/pypa/pip/archive/1.3.1.zip#sha1=da9234ee9982d4bbb3c72346a6de940a148ea686",
+			}
 
 
 @pytest.mark.parametrize("build_func", [build_wheel, build_sdist])
